@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ED TRIAGE SYSTEM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f9;
+        }
+
+        .header {
+            background-color: #1f2d3d;
+            color: white;
+            padding: 15px 30px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h3 {
+            margin-top: 0;
+        }
+
+        input, button {
+            padding: 6px;
+            margin: 4px 0;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .red { background-color: #dc3545; }
+        .orange { background-color: #fd7e14; }
+        .yellow { background-color: #ffc107; color: black; }
+        .green { background-color: #28a745; }
+
+        pre {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    🫀 QUY TRÌNH NHẬN BỆNH KHOA A2A
+</div>
+
+<div class="container">
+
+    <!-- LEFT PANEL -->
+    <div class="panel">
+        <form method="POST">
+
+            <h3>Triệu chứng</h3>
+            <label><input type="checkbox" name="symptoms" value="Đau ngực"> Đau ngực</label><br>
+            <label><input type="checkbox" name="symptoms" value="Khó thở"> Khó thở</label><br>
+
+
+            <hr>
+
+            <h3>Dấu hiệu sinh tồn</h3>
+
+            Mạch:<br>
+            <input type="number" name="pulse"><br>
+
+            Huyết áp:<br>
+            <input type="text" name="bp" placeholder="120/80"><br>
+
+            SpO2:<br>
+            <input type="number" name="spo2"><br>
+
+            <button type="submit">PHÂN LOẠI</button>
+
+        </form>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel">
+
+        <h3>KẾT QUẢ PHÂN LOẠI</h3>
+
+        {% if result %}
+
+            {% set color_class = "" %}
+            {% if "ĐỎ" in result %}
+                {% set color_class = "red" %}
+            {% elif "CAM" in result %}
+                {% set color_class = "orange" %}
+            {% elif "VÀNG" in result %}
+                {% set color_class = "yellow" %}
+            {% elif "XANH" in result %}
+                {% set color_class = "green" %}
+            {% endif %}
+
+            <div class="result-box {{ color_class }}">
+                <pre>{{ result }}</pre>
+            </div>
+
+        {% else %}
+            <p>Chưa có dữ liệu.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
