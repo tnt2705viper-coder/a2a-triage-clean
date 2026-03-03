@@ -1,139 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>QUY TRÌNH NHẬN BỆNH KHOA A2A</title>
+    <title>QUY TRÌNH NHẬN BỆNH A2A</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
         body {
             font-family: "Segoe UI", Arial, sans-serif;
             background: linear-gradient(135deg, #0f4c75, #1b8a5a);
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
             margin:0;
+            padding:10px;
         }
 
         .container {
             background:white;
-            padding:25px;
-            border-radius:18px;
-            width:95%;
-            max-width:420px;
-            text-align:center;
-            box-shadow:0 15px 35px rgba(0,0,0,0.25);
-            position:relative;
+            border-radius:16px;
+            padding:18px;
+            max-width:500px;
+            margin:auto;
+            box-shadow:0 8px 20px rgba(0,0,0,0.2);
         }
 
         .logo {
             width:80px;
-            margin-bottom:10px;
+            display:block;
+            margin:0 auto 6px auto;
         }
 
         h2 {
-            margin:5px 0 20px 0;
+            text-align:center;
+            font-size:22px;
+            font-weight:700;
+            margin-bottom:12px;
             color:#0f4c75;
+            white-space:nowrap;
         }
 
         input[type="number"] {
             width:100%;
-            padding:12px;
-            margin:8px 0;
-            border-radius:10px;
+            padding:10px;
+            margin:6px 0;
+            border-radius:8px;
             border:1px solid #ccc;
             font-size:16px;
-            transition:0.2s;
         }
 
-        input[type="number"]:focus {
-            border-color:#1b8a5a;
-            box-shadow:0 0 5px rgba(27,138,90,0.4);
-            outline:none;
+        .row-group {
+            display:flex;
+            gap:6px;
+        }
+
+        .row-group input {
+            flex:1;
         }
 
         .bp-group {
             display:flex;
-            align-items:center;
-            gap:8px;
+            gap:6px;
         }
 
         .bp-group input {
-            width:45%;
-        }
-
-        .bp-group span {
-            font-size:18px;
-            font-weight:bold;
+            flex:1;
         }
 
         h4 {
-            margin-top:15px;
-            margin-bottom:8px;
+            font-size:14px;
+            margin:10px 0 5px 0;
             color:#333;
         }
 
         label {
-            display:block;
-            text-align:left;
-            margin:6px 0;
-            font-size:14px;
+            font-size:15px;
+            margin-right:12px;
         }
 
-        input[type="checkbox"] {
+        .inline-options {
+            display:flex;
+            gap:15px;
+            flex-wrap:wrap;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            transform:scale(1.2);
             margin-right:6px;
         }
 
         button {
             width:100%;
-            padding:14px;
-            margin-top:15px;
+            padding:12px;
+            margin-top:12px;
             border:none;
-            border-radius:12px;
+            border-radius:10px;
             font-weight:bold;
             background:linear-gradient(90deg,#1b8a5a,#0f4c75);
             color:white;
             font-size:16px;
-            cursor:pointer;
-            transition:0.3s;
-        }
-
-        button:hover {
-            transform:translateY(-2px);
-            box-shadow:0 5px 15px rgba(0,0,0,0.3);
         }
 
         .result {
-            margin-top:18px;
-            padding:14px;
-            border-radius:12px;
+            margin-top:15px;
+            padding:12px;
+            border-radius:10px;
             font-weight:bold;
-            font-size:18px;
+            font-size:16px;
+            white-space:pre-line;
         }
 
-        .red { 
-            background:#d32f2f; 
-            color:white; 
-            animation:shake 0.5s infinite;
-        }
+        .red { background:#d32f2f; color:white; }
+        .yellow { background:#fbc02d; color:black; }
+        .green { background:#388e3c; color:white; }
+        .normal { background:#cccccc; color:black; }
 
-        .yellow { 
-            background:#fbc02d; 
-            color:black;
-        }
-
-        .green { 
-            background:#388e3c; 
-            color:white;
-        }
-
-        @keyframes shake {
-            0%{transform:translateX(0);}
-            25%{transform:translateX(-5px);}
-            50%{transform:translateX(5px);}
-            75%{transform:translateX(-5px);}
-            100%{transform:translateX(0);}
-        }
     </style>
 </head>
 
@@ -141,38 +119,54 @@
 
 <div class="container">
 
-    <!-- LOGO BV175 -->
     <img src="{{ url_for('static', filename='logo175.jpg') }}" class="logo">
 
-    <h2>QUY TRÌNH NHẬN BỆNH<br>KHOA A2A</h2>
+    <h2>QUY TRÌNH NHẬN BỆNH KHOA A2A</h2>
 
     <form method="POST">
 
-        <!-- MẠCH -->
-        <input type="number" id="pulse" name="pulse" placeholder="Mạch"
-               oninput="jumpNext(this, 'systolic', 3)">
+        <!-- MẠCH + SpO2 CÙNG HÀNG -->
+        <div class="row-group">
+            <input type="number" name="pulse" placeholder="Mạch (ECG)">
+            <input type="number" name="spo2" placeholder="SpO2 (%)">
+        </div>
 
         <!-- HUYẾT ÁP -->
         <div class="bp-group">
-            <input type="number" id="systolic" name="systolic" 
-                   placeholder="HA tâm thu"
-                   oninput="jumpNext(this, 'diastolic', 3)">
-            <span>/</span>
-            <input type="number" id="diastolic" name="diastolic" 
-                   placeholder="HA tâm trương"
-                   oninput="jumpNext(this, 'spo2', 2)">
+            <input type="number" name="systolic" placeholder="HA tâm thu">
+            <input type="number" name="diastolic" placeholder="HA tâm trương">
         </div>
 
-        <!-- SPO2 -->
-        <input type="number" id="spo2" name="spo2" placeholder="SpO2">
+        <h4>Triệu chứng</h4>
+        <div class="inline-options">
+            <label><input type="checkbox" name="chest_pain"> Đau ngực/Khó thở</label>
+        </div>
 
-        <h4>Bệnh nhân đang sử dụng thuốc:</h4>
+        <h4>Tri giác</h4>
+        <!-- GLS 15 & <15 CÙNG HÀNG -->
+        <div class="inline-options">
+            <label><input type="radio" name="gcs" value="15"> GLS 15</label>
+            <label><input type="radio" name="gcs" value="lt15"> GLS &lt;15</label>
+        </div>
 
-        <label><input type="checkbox" name="meds" value="dobutamin"> Dobutamin</label>
-        <label><input type="checkbox" name="meds" value="noradrenalin"> Noradrenalin</label>
-        <label><input type="checkbox" name="meds" value="nitroglycerin"> Nitroglycerin</label>
-        <label><input type="checkbox" name="meds" value="insulin"> Insulin</label>
-        <label><input type="checkbox" name="oxygen" value="yes"> Thở oxy</label>
+        <h4>ECG</h4>
+        <div class="inline-options">
+            <label><input type="checkbox" name="stemi"> STEMI</label>
+        </div>
+
+        <h4>Thuốc</h4>
+        <div class="inline-options">
+            <label><input type="checkbox" name="meds" value="dobutamin"> Dobutamin</label>
+            <label><input type="checkbox" name="meds" value="noradrenalin"> Noradrenalin</label>
+            <label><input type="checkbox" name="meds" value="nitroglycerin"> Nitroglycerin</label>
+            <label><input type="checkbox" name="meds" value="insulin"> Insulin</label>
+        </div>
+
+        <h4>Oxy</h4>
+        <div class="inline-options">
+            <label><input type="radio" name="oxygen_type" value="nasal"> Oxy nhánh</label>
+            <label><input type="radio" name="oxygen_type" value="mask"> Mask+</label>
+        </div>
 
         <button type="submit">PHÂN LOẠI</button>
     </form>
@@ -184,14 +178,6 @@
     {% endif %}
 
 </div>
-
-<script>
-function jumpNext(current, nextId, maxLength) {
-    if (current.value.length >= maxLength) {
-        document.getElementById(nextId).focus();
-    }
-}
-</script>
 
 </body>
 </html>
