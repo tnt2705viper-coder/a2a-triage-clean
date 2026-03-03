@@ -2,90 +2,139 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
+def classify(pulse, systolic, diastolic, spo2, meds):
+
+    warning = None
+
+    # Kiểm tra thiếu sinh hiệu
+    if not pulse or not systolic or not diastolic or not spo2:
+        warning = "⚠️ Vui lòng bổ sung đầy đủ sinh hiệu"
+
+    # Ép kiểu nếu có giá trị
+    pulse = int(pulse) if pulse else None
+    systolic = int(systolic) if systolic else None
+    diastolic = int(diastolic) if diastolic else None
+    spo2 = int(spo2) if spo2 else None
+
+    # =========================
+    # ====== ƯU TIÊN ĐỎ =======
+    # =========================
+
+    # Thuốc vận mạch -> ĐỎ (KHÔNG cần đủ sinh hiệu)
+    if "dobutamin" in meds or "noradrenalin" in meds:
+        return combine_result(
+            "🔴 ĐỎ - Đang dùng thuốc vận mạch\n➡ Xếp bệnh nhân vào PHÒNG CẤP CỨU",
+            "red",
+            warning
+        )
+
+    # HA thấp nguy hiểm
+    if systolic is not None and diastolic is not None:
+        if systolic < 90 or diastolic < 60:
+            return combine_result(
+                "🔴 ĐỎ - Huyết áp nguy hiểm\n➡ Xếp bệnh nhân vào PHÒNG CẤP CỨU",
+                "red",
+                warning
+            )
+
+    # SpO2 nguy hiểm
+    if spo2 is not None:
+        if spo2 < 90:
+            return combine_result(
+                "🔴 ĐỎ - SpO2 nguy hiểm\n➡ Xếp bệnh nhân vào PHÒNG CẤP CỨU",
+                "red",
+                warning
+            )
+
+    # Mạch nguy hiểm
+    if pulse is not None:
+        if pulse < 50 or pulse > 160:
+            return combine_result(
+                "🔴 ĐỎ - Mạch nguy hiểm\n➡ Xếp bệnh nhân vào PHÒNG CẤP CỨU",
+                "red",
+                warning
+            )
+
+    # =========================
+    # ====== ƯU TIÊN VÀNG =====
+    # =========================
+
+    # Nếu có checkbox (ngoài vận mạch)
+    if len(meds) > 0:
+        return combine_result(
+            "🟡 VÀNG - Có sử dụng thuốc nguy cơ\n➡ Xếp bệnh nhân vào PHÒNG THEO DÕI (3,4,10,11)",
+            "yellow",
+            warning
+        )
+
+    # HA cao
+    if systolic is not None and diastolic is not None:
+        if systolic > 180 or diastolic > 100:
+            return combine_result(
+                "🟡 VÀNG - Huyết áp cao\n➡ Xếp bệnh nhân vào PHÒNG THEO DÕI (3,4,10,11)",
+                "yellow",
+                warning
+            )
+
+    # SpO2 giảm
+    if spo2 is not None:
+        if spo2 < 95:
+            return combine_result(
+                "🟡 VÀNG - SpO2 giảm\n➡ Xếp bệnh nhân vào PHÒNG THEO DÕI (3,4,10,11)",
+                "yellow",
+                warning
+            )
+
+    # Mạch nhanh
+    if pulse is not None:
+        if pulse > 110:
+            return combine_result(
+                "🟡 VÀNG - Mạch nhanh\n➡ Xếp bệnh nhân vào PHÒNG THEO DÕI (3,4,10,11)",
+                "yellow",
+                warning
+            )
+
+    # =========================
+    # ========= XANH ==========
+    # =========================
+
+    # Chỉ xanh khi đủ sinh hiệu và không có thuốc
+    if not warning and len(meds) == 0:
+        return (
+            "🟢 XANH - Sinh hiệu ổn định\n➡ Xếp bệnh nhân vào PHÒNG THƯỜNG",
+            "green"
+        )
+
+    # Nếu thiếu sinh hiệu mà không đủ dữ kiện phân loại
+    return combine_result(
+        "⚠️ Chưa đủ dữ kiện phân loại chính xác",
+        "normal",
+        warning
+    )
+
+
+def combine_result(main_text, level, warning):
+    if warning:
+        full_text = warning + "\n\n" + main_text
+        return full_text, level
+    return main_text, level
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    result = ""
+    result = None
+    level = None
 
     if request.method == "POST":
-
-        # ===== LẤY DỮ LIỆU =====
-        symptoms_list = request.form.getlist("symptoms")
         pulse = request.form.get("pulse")
-        bp = request.form.get("bp")
+        systolic = request.form.get("systolic")
+        diastolic = request.form.get("diastolic")
         spo2 = request.form.get("spo2")
+        meds = request.form.getlist("meds")
 
-        # ===== CHUYỂN ĐỔI SỐ =====
-        try:
-            pulse = int(pulse) if pulse else None
-            spo2 = int(spo2) if spo2 else None
+        result, level = classify(pulse, systolic, diastolic, spo2, meds)
 
-            if bp and "/" in bp:
-                systolic = int(bp.split("/")[0])
-                diastolic = int(bp.split("/")[1])
-            else:
-                systolic = None
-                diastolic = None
-
-        except:
-            pulse = None
-            spo2 = None
-            systolic = None
-            diastolic = None
-
-        # ===== XÁC ĐỊNH SINH HIỆU BÌNH THƯỜNG =====
-        pulse_normal = pulse is not None and 60 <= pulse <= 110
-        bp_normal = (
-            systolic is not None and diastolic is not None and
-            systolic >= 90 and diastolic >= 60 and
-            systolic <= 180 and diastolic <= 100
-        )
-        spo2_normal = spo2 is not None and spo2 > 95
-
-        vitals_normal = pulse_normal and bp_normal and spo2_normal
-
-        # =================================================
-        # ================= PHÂN LOẠI ====================
-        # =================================================
-
-        # 🔴 ĐỎ – Sốc hoặc giảm oxy
-        if (systolic is not None and systolic < 90) or \
-           (spo2 is not None and spo2 <= 95):
-
-            result = """MỨC ƯU TIÊN: ĐỎ
-ĐÁNH GIÁ BAN ĐẦU: Huyết động không ổn định hoặc giảm oxy máu
-
-➡ Xếp bệnh nhân vào phòng cấp cứu"""
-
-            return render_template("index.html", result=result)
-
-        # 🟡 VÀNG – Có đau ngực nhưng sinh hiệu ổn
-        if "Đau ngực" in symptoms_list and vitals_normal:
-
-            result = """MỨC ƯU TIÊN: VÀNG
-ĐÁNH GIÁ BAN ĐẦU: Đau ngực, sinh hiệu hiện tại ổn định
-
-➡ Xếp bệnh nhân vào phòng theo dõi gần phòng cấp cứu"""
-
-            return render_template("index.html", result=result)
-
-        # 🟢 XANH – Không triệu chứng và sinh hiệu bình thường
-        if not symptoms_list and vitals_normal:
-
-            result = """MỨC ƯU TIÊN: XANH
-ĐÁNH GIÁ BAN ĐẦU: Không ghi nhận triệu chứng, sinh hiệu bình thường
-
-➡ Xếp phòng không cấp cứu"""
-
-            return render_template("index.html", result=result)
-
-        # Nếu không rơi vào các nhóm trên
-        result = """MỨC ƯU TIÊN: VÀNG
-ĐÁNH GIÁ BAN ĐẦU: Có dấu hiệu cần theo dõi thêm
-
-➡ Xếp bệnh nhân vào phòng theo dõi"""
-
-    return render_template("index.html", result=result)
+    return render_template("index.html", result=result, level=level)
 
 
 if __name__ == "__main__":

@@ -1,225 +1,197 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Quy trình nhận bệnh khoa A2A</title>
+    <title>QUY TRÌNH NHẬN BỆNH KHOA A2A</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #e8f5e9, #f1f8f4);
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #0f4c75, #1b8a5a);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            margin:0;
         }
 
-        .header {
-            background: linear-gradient(90deg, #1b5e20, #2e7d32);
-            color: white;
-            padding: 30px 20px 25px 20px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .container {
+            background:white;
+            padding:25px;
+            border-radius:18px;
+            width:95%;
+            max-width:420px;
+            text-align:center;
+            box-shadow:0 15px 35px rgba(0,0,0,0.25);
+            position:relative;
         }
 
-        .logo-wrapper {
-            background: white;
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            margin: 0 auto 15px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        .logo {
+            width:80px;
+            margin-bottom:10px;
         }
 
-        .logo-wrapper img {
-            width: 70px;
-            height: 70px;
-            object-fit: contain;
+        h2 {
+            margin:5px 0 20px 0;
+            color:#0f4c75;
         }
 
-        .header-title {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: 1px;
+        input[type="number"] {
+            width:100%;
+            padding:12px;
+            margin:8px 0;
+            border-radius:10px;
+            border:1px solid #ccc;
+            font-size:16px;
+            transition:0.2s;
         }
 
-        .main {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+        input[type="number"]:focus {
+            border-color:#1b8a5a;
+            box-shadow:0 0 5px rgba(27,138,90,0.4);
+            outline:none;
         }
 
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            transition: 0.3s;
+        .bp-group {
+            display:flex;
+            align-items:center;
+            gap:8px;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
+        .bp-group input {
+            width:45%;
         }
 
-        h3 {
-            margin-top: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #2e7d32;
+        .bp-group span {
+            font-size:18px;
+            font-weight:bold;
+        }
+
+        h4 {
+            margin-top:15px;
+            margin-bottom:8px;
+            color:#333;
         }
 
         label {
-            display: flex;
-            align-items: center;
-            font-size: 20px;
-            margin: 16px 0;
+            display:block;
+            text-align:left;
+            margin:6px 0;
+            font-size:14px;
         }
 
         input[type="checkbox"] {
-            transform: scale(1.8);
-            margin-right: 14px;
-            accent-color: #2e7d32;
-        }
-
-        input[type="number"],
-        input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            font-size: 20px;
-            border-radius: 12px;
-            border: 1px solid #ccc;
-            margin-bottom: 16px;
-            box-sizing: border-box;
+            margin-right:6px;
         }
 
         button {
-            width: 100%;
-            padding: 18px;
-            font-size: 22px;
-            border-radius: 14px;
-            border: none;
-            background: linear-gradient(90deg, #2e7d32, #1b5e20);
-            color: white;
-            font-weight: 700;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: 0.3s;
+            width:100%;
+            padding:14px;
+            margin-top:15px;
+            border:none;
+            border-radius:12px;
+            font-weight:bold;
+            background:linear-gradient(90deg,#1b8a5a,#0f4c75);
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+            transition:0.3s;
         }
 
-        button:active {
-            transform: scale(0.96);
+        button:hover {
+            transform:translateY(-2px);
+            box-shadow:0 5px 15px rgba(0,0,0,0.3);
         }
 
         .result {
-            padding: 25px;
-            border-radius: 18px;
-            font-size: 26px;
-            font-weight: 800;
-            text-align: center;
-            margin-top: 15px;
-            animation: fadeIn 0.4s ease-in-out;
+            margin-top:18px;
+            padding:14px;
+            border-radius:12px;
+            font-weight:bold;
+            font-size:18px;
         }
 
-        .red {
-            background: linear-gradient(135deg, #e53935, #b71c1c);
-            color: white;
+        .red { 
+            background:#d32f2f; 
+            color:white; 
+            animation:shake 0.5s infinite;
         }
 
-        .yellow {
-            background: linear-gradient(135deg, #ffd54f, #ffb300);
-            color: black;
+        .yellow { 
+            background:#fbc02d; 
+            color:black;
         }
 
-        .green {
-            background: linear-gradient(135deg, #66bb6a, #1b5e20);
-            color: white;
+        .green { 
+            background:#388e3c; 
+            color:white;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @media (min-width: 768px) {
-            .main {
-                flex-direction: row;
-            }
-            .card {
-                flex: 1;
-            }
+        @keyframes shake {
+            0%{transform:translateX(0);}
+            25%{transform:translateX(-5px);}
+            50%{transform:translateX(5px);}
+            75%{transform:translateX(-5px);}
+            100%{transform:translateX(0);}
         }
     </style>
 </head>
+
 <body>
 
-<div class="header">
+<div class="container">
 
-    <div class="logo-wrapper">
-        <img src="{{ url_for('static', filename='logo175.jpg') }}" alt="Logo BV 175">
-    </div>
+    <!-- LOGO BV175 -->
+    <img src="{{ url_for('static', filename='logo175.jpg') }}" class="logo">
 
-    <div class="header-title">
-        QUY TRÌNH NHẬN BỆNH KHOA A2A
+    <h2>QUY TRÌNH NHẬN BỆNH<br>KHOA A2A</h2>
+
+    <form method="POST">
+
+        <!-- MẠCH -->
+        <input type="number" id="pulse" name="pulse" placeholder="Mạch"
+               oninput="jumpNext(this, 'systolic', 3)">
+
+        <!-- HUYẾT ÁP -->
+        <div class="bp-group">
+            <input type="number" id="systolic" name="systolic" 
+                   placeholder="HA tâm thu"
+                   oninput="jumpNext(this, 'diastolic', 3)">
+            <span>/</span>
+            <input type="number" id="diastolic" name="diastolic" 
+                   placeholder="HA tâm trương"
+                   oninput="jumpNext(this, 'spo2', 2)">
+        </div>
+
+        <!-- SPO2 -->
+        <input type="number" id="spo2" name="spo2" placeholder="SpO2">
+
+        <h4>Bệnh nhân đang sử dụng thuốc:</h4>
+
+        <label><input type="checkbox" name="meds" value="dobutamin"> Dobutamin</label>
+        <label><input type="checkbox" name="meds" value="noradrenalin"> Noradrenalin</label>
+        <label><input type="checkbox" name="meds" value="nitroglycerin"> Nitroglycerin</label>
+        <label><input type="checkbox" name="meds" value="insulin"> Insulin</label>
+        <label><input type="checkbox" name="oxygen" value="yes"> Thở oxy</label>
+
+        <button type="submit">PHÂN LOẠI</button>
+    </form>
+
+    {% if result %}
+    <div class="result {{ level }}">
+        {{ result }}
     </div>
+    {% endif %}
 
 </div>
 
-<div class="main">
-
-    <div class="card">
-        <form method="POST">
-
-            <h3>Triệu chứng</h3>
-
-            <label>
-                <input type="checkbox" name="chest_pain">
-                Đau ngực
-            </label>
-
-            <label>
-                <input type="checkbox" name="dyspnea">
-                Khó thở
-            </label>
-
-            <hr>
-
-            <h3>Dấu hiệu sinh tồn</h3>
-
-            <label>Mạch</label>
-            <input type="number" name="pulse" placeholder="Ví dụ: 80">
-
-            <label>Huyết áp</label>
-            <input type="text" name="bp" placeholder="120/80">
-
-            <label>SpO2 (%)</label>
-            <input type="number" name="spo2" placeholder="98">
-
-            <button type="submit">PHÂN LOẠI NGAY</button>
-
-        </form>
-    </div>
-
-    <div class="card">
-        <h3>KẾT QUẢ</h3>
-
-        {% if result %}
-            <div class="result
-                {% if 'ĐỎ' in result %} red
-                {% elif 'VÀNG' in result %} yellow
-                {% elif 'XANH' in result %} green
-                {% endif %}
-            ">
-                {{ result }}
-            </div>
-        {% else %}
-            <p style="font-size:20px;">Chưa có dữ liệu.</p>
-        {% endif %}
-    </div>
-
-</div>
+<script>
+function jumpNext(current, nextId, maxLength) {
+    if (current.value.length >= maxLength) {
+        document.getElementById(nextId).focus();
+    }
+}
+</script>
 
 </body>
 </html>
